@@ -26,3 +26,24 @@ Versions from previous years can be found in tags.
 
 
 # mun harjoitusmodaus
+  140  mkdir CSCss
+  141  cd CSCss/
+  142  nano test.txt
+  143  scp test.txt lautuppi@sisu.csc.fi:/homeappl/home/lautuppi/appl_sisu/CSCss 
+  144  git config --global user.name "laurituppi"
+  145  git config --global user.email "lauri.tuppi@helsinki.fi"
+  146  git clone [xh,yh]=hist(squeeze(ens(fcrange(k),j,:)),bins);
+  147  git clone https://github.com/laurituppi/summerschool.git
+  148  ls
+  149  ls summerschool/
+  150  cd summerschool/
+  151  git status
+  152  git pull https://github.com/laurituppi/summerschool.git
+  153  git log
+  154  git pull https://github.com/csc-training/summerschool.git
+  155  git log
+  156  git push 
+  157  git status
+  158  nano README.md 
+  159  git add README.md 
+  160  git commit -m "training commission made on 26th jun 2018"
