@@ -18,14 +18,14 @@ program heat_solve
   integer, parameter :: image_interval = 500 ! Image output interval
 
   type(parallel_data) :: parallelization
-  integer :: ierr
+  integer :: ierr,rc
 
   integer :: iter
 
   real(kind=dp) :: start, stop ! Timers
 
   ! TODO start: initialize MPI
-
+  call mpi_init(rc)
   ! TODO end
 
   call initialize(current, previous, nsteps, parallelization)
@@ -43,7 +43,7 @@ program heat_solve
   start =  mpi_wtime()
 
   do iter = 1, nsteps
-     call exchange(previous, parallelization)
+     call exchange(previous)
      call evolve(current, previous, a, dt)
      if (mod(iter, image_interval) == 0) then
         call write_field(current, iter, parallelization)
@@ -61,7 +61,7 @@ program heat_solve
   call finalize(current, previous)
 
   ! TODO start: finalize MPI
-
+  call mpi_finalize(rc)
   ! TODO end
 
 end program heat_solve
