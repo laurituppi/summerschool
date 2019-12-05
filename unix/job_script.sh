@@ -5,6 +5,6 @@
 #SBATCH -n 24
 #SBATCH -p small
 #SBATCH -t 5
-#SBATCH --reservation=summer_school
 
+aprun /homeappl/home/lautuppi/appl_sisu/CSCss/summerschool/unix/prog
 

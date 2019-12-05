@@ -4,10 +4,11 @@ program coll_exer
 
   integer, parameter :: n_mpi_tasks = 4
 
-  integer :: ntasks, rank, ierr, i, color, sub_comm
+  integer :: ntasks, rank, ierr, i, color, sub_comm, request
   integer, dimension(2*n_mpi_tasks) :: sendbuf, recvbuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
   integer, dimension(n_mpi_tasks) :: counts,dspls
+  integer :: status(MPI_STATUS_SIZE)
 
   call mpi_init(ierr)
   call mpi_comm_size(MPI_COMM_WORLD, ntasks, ierr)
@@ -32,6 +33,7 @@ program coll_exer
   !5))
   !a)
   !call mpi_bcast(sendbuf,size(sendbuf),mpi_integer,0,mpi_comm_world,ierr)
+  call mpi_ibcast(sendbuf,size(sendbuf),mpi_integer,0,mpi_comm_world,request,ierr)
 
   !b)
   !call mpi_scatter(sendbuf,2,mpi_integer,recvbuf,2,mpi_integer,0,mpi_comm_world,ierr)
@@ -45,19 +47,20 @@ program coll_exer
   !call mpi_alltoall(sendbuf,2,mpi_integer,recvbuf,2,mpi_integer,mpi_comm_world,ierr)
 
   !6))
-  if (rank<2) then
-    color=1
-  else
-    color=2
-  endif
+ ! if (rank<2) then
+ !   color=1
+ ! else
+ !   color=2
+ ! endif
 
-  call mpi_comm_split(mpi_comm_world,color,rank,sub_comm,ierr)
-  call mpi_reduce(sendbuf,recvbuf,8,mpi_integer,mpi_sum,0,sub_comm,ierr)
+ ! call mpi_comm_split(mpi_comm_world,color,rank,sub_comm,ierr)
+ ! call mpi_reduce(sendbuf,recvbuf,8,mpi_integer,mpi_sum,0,sub_comm,ierr)
 
   ! Print data that was received
   ! TODO: add correct buffer
-  call print_buffers(recvbuf)
-  !call print_buffers(sendbuf)
+  call mpi_waitall(1,request,status,ierr)
+  !call print_buffers(recvbuf)
+  call print_buffers(sendbuf)
 
   call mpi_finalize(ierr)
 

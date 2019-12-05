@@ -11,11 +11,17 @@ program datatype_struct
   type(particle) :: particles(n)
 
   integer, parameter :: cnt=3
-  integer:: particle_mpi_type, temp_type
+  integer:: particle_mpi_type, temp_type, count
   integer:: types(cnt),blocklen(cnt)
   integer(KIND=MPI_ADDRESS_KIND) :: disp(cnt)
   integer(KIND=MPI_ADDRESS_KIND) :: lb, extent
   real(8) :: t1,t2
+  
+
+  count=3
+  blocklen=[1,1,1]
+  disp=1
+  types=[mpi_real,mpi_integer,mpi_character]
 
   call MPI_INIT(ierror)
   call MPI_COMM_RANK(MPI_COMM_WORLD, myid, ierror)
@@ -31,12 +37,16 @@ program datatype_struct
   end if
 
   ! TODO: define the datatype for type particle
-
+  call mpi_type_create_struct(count,blocklen,disp,types,temp_type,ierror)
   ! TODO: Check extent.
   ! (Not really neccessary on most systems.)
+  call mpi_type_get_extent(temp_type,lb,extent,ierror)
   ! TODO: resize the particle_mpi_type if needed
+  call mpi_type_create_resized(temp_type,lb,extent,ierror)
   if(extent /= disp(2)-disp(1)) then
      ! TODO: resize the particle_mpi_type if needed
+     particle_mpi_type=temp_type
+     call mpi_type_create_resized(particle_mpi_type,lb,extent,ierror)
   end if
 
 

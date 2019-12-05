@@ -39,6 +39,20 @@ contains
 
     ! TODO: Implement a function that writers the whole array of elements
     !       to a file so that single process is responsible for the file io
+    integer :: n,tag,funit
+    funit=22
+    tag=773*my_id
+    if (my_id==0) then
+      fullvector(1:localsize)=localvector
+      do i=1,ntasks-1
+        call mpi_recv(fullvector(i*localsize),localsize,mpi_integer,i,773*i,mpi_comm_world,mpi_status_ignore,rc)
+      end do
+      open(funit,file='testdata.dat',access='stream')
+      write(funit) fullvector
+      close(funit)
+    else
+      call mpi_send(localvector,localsize,mpi_integer,0,tag,mpi_comm_world,rc)
+    end if
 
   end subroutine single_writer
 

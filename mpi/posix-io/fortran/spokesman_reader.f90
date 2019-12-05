@@ -41,6 +41,21 @@ contains
 
     ! TODO: Implement a function that will read the data from a file so that
     !       a single process does the file io. Use rank WRITER_ID as the io rank
+    integer :: tag
+    tag=773*my_id
+    if (my_id==writer_id) then
+      open(22,file='testdata.dat',access='stream')
+      read(22) fullvector
+      close(22)
+      !call mpi_recv(localvector,localsize,mpi_integer,writer_id,tag,mpi_comm_world,mpi_status_ignore,rc)
+      localvector=fullvector(1:localsize)
+      !print*,fullvector
+      do i=1,ntasks-1
+        call mpi_send(fullvector(i*localsize:(i+1)*localsize),localsize,mpi_integer,i,773*i,mpi_comm_world,rc)
+      end do
+    else
+      call mpi_recv(localvector,localsize,mpi_integer,writer_id,tag,mpi_comm_world,mpi_status_ignore,rc)
+    end if
 
   end subroutine single_reader
 

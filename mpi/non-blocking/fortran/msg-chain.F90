@@ -4,7 +4,7 @@ program basic
 
   implicit none
   integer, parameter :: size = 10000000
-  integer :: rc, myid, ntasks
+  integer :: rc, myid, ntasks, recv_obj, send_obj
   integer :: message(size)
   integer :: receiveBuffer(size)
   integer :: status(MPI_STATUS_SIZE,2)
@@ -39,6 +39,16 @@ program basic
 
   ! TODO: Implement the message passing using non-blocking
   !       sends and receives
+  !***** non-blocking
+  !call mpi_isend(message,size,mpi_integer,destination,myid+1,mpi_comm_world,requests(1),rc)
+  !call mpi_irecv(receiveBuffer,size,mpi_integer,source,myid,mpi_comm_world,requests(2),rc)
+
+  !***** persistent
+  call mpi_recv_init(receiveBuffer,size,mpi_integer,source,myid,mpi_comm_world,recv_obj,rc)
+  call mpi_send_init(message,size,mpi_integer,destination,myid+1,mpi_comm_world,send_obj,rc)
+
+  call mpi_start(recv_obj,rc)
+  call mpi_start(send_obj,rc)
 
   write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
        ' Sent elements: ', size, &
@@ -46,7 +56,9 @@ program basic
 
   ! TODO: Add here a synchronization call so that you can be sure
   !       that the message has been received
-
+  !call mpi_waitall(2,requests,status,rc)
+  call mpi_wait(send_obj,mpi_status_ignore,rc)
+  call mpi_wait(recv_obj,mpi_status_ignore,rc)
   call MPI_GET_COUNT(status(:,1), MPI_INTEGER, count, rc)
   write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Receiver: ', myid, &
        'received elements: ', count, &
@@ -59,6 +71,9 @@ program basic
   call flush(6)
 
   write(*, '(A20, I3, A, F6.3)') 'Time elapsed in rank', myid, ':', t1-t0
+
+  call mpi_request_free(recv_obj,rc)
+  call mpi_request_free(send_obj,rc)
 
   call mpi_finalize(rc)
 end program basic
